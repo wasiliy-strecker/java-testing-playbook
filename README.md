@@ -12,9 +12,10 @@ invalid business transitions, overselling under concurrency, transaction
 rollback, database contract drift, malformed upstream responses, and unstable
 HTTP behavior.
 
-> **Current milestone — build foundation:** the Maven reactor, module
-> boundaries, pinned toolchain, and Java 21/25 verification are in place.
-> Reservation behavior and its tests arrive in the next milestone.
+> **Current milestone — deterministic core:** the framework-independent domain
+> now models reservation, lookup, and idempotent release. Application ports,
+> fixed time and identity, and focused tests make the use cases repeatable
+> without Spring, a database, or broad mocking.
 
 ## Planned proof points
 
@@ -64,7 +65,7 @@ both tools support JUnit Platform 6.
 ## Roadmap
 
 - [x] Reproducible multi-module build and Java 21/25 CI
-- [ ] Reservation domain with deterministic unit tests
+- [x] Reservation domain with deterministic unit tests
 - [ ] Testkit and property-based invariants
 - [ ] PostgreSQL contracts and concurrency scenarios
 - [ ] HTTP boundary and component tests
