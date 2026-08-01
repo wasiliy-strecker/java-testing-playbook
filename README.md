@@ -12,10 +12,10 @@ invalid business transitions, overselling under concurrency, transaction
 rollback, database contract drift, malformed upstream responses, and unstable
 HTTP behavior.
 
-> **Current milestone — deterministic core:** the framework-independent domain
-> now models reservation, lookup, and idempotent release. Application ports,
-> fixed time and identity, and focused tests make the use cases repeatable
-> without Spring, a database, or broad mocking.
+> **Current milestone — reusable testkit:** deterministic clocks and identifiers,
+> thread-safe in-memory adapters, and focused fixture builders now support
+> behavior tests without broad mocking. jqwik properties probe stock conservation
+> and reservation lifecycle invariants across replayable input combinations.
 
 ## Planned proof points
 
@@ -57,7 +57,7 @@ CI runs the same reactor on Java 21 and Java 25.
 ## Deliberate toolchain boundary
 
 Java 21 is the production baseline. Spring Boot 3.5 and JUnit 5.14 are selected
-for the testing example because the planned jqwik and PIT integrations still
+for the testing example because jqwik and the planned PIT integration still
 target JUnit Platform 1.x. The decision is recorded in
 [ADR 0001](docs/decisions/0001-testing-toolchain.md) and will be revisited when
 both tools support JUnit Platform 6.
@@ -66,7 +66,7 @@ both tools support JUnit Platform 6.
 
 - [x] Reproducible multi-module build and Java 21/25 CI
 - [x] Reservation domain with deterministic unit tests
-- [ ] Testkit and property-based invariants
+- [x] Testkit and property-based invariants
 - [ ] PostgreSQL contracts and concurrency scenarios
 - [ ] HTTP boundary and component tests
 - [ ] Coverage and mutation quality gates

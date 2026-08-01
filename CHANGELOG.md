@@ -16,3 +16,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
   persistence, transaction, time, and identity boundaries
 - Deterministic domain and use-case tests for validation, insufficient stock,
   product eligibility, lookup, and idempotent release
+- Reusable deterministic clock, identifier generator, fixture builder, and
+  thread-safe in-memory adapters in `reservation-testkit`
+- Replayable jqwik properties for stock conservation and reservation lifecycle
+  invariants
