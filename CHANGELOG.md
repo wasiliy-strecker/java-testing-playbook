@@ -20,3 +20,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
   thread-safe in-memory adapters in `reservation-testkit`
 - Replayable jqwik properties for stock conservation and reservation lifecycle
   invariants
+- Spring JDBC reservation and stock adapters behind the framework-independent
+  application ports
+- Flyway-managed PostgreSQL schema with lifecycle and stock constraints
+- Spring Boot integration coverage against a disposable PostgreSQL 17 container
