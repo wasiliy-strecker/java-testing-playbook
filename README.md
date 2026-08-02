@@ -12,10 +12,10 @@ invalid business transitions, overselling under concurrency, transaction
 rollback, database contract drift, malformed upstream responses, and unstable
 HTTP behavior.
 
-> **Current milestone — reusable testkit:** deterministic clocks and identifiers,
-> thread-safe in-memory adapters, and focused fixture builders now support
-> behavior tests without broad mocking. jqwik properties probe stock conservation
-> and reservation lifecycle invariants across replayable input combinations.
+> **Current milestone — PostgreSQL persistence foundation:** Spring JDBC adapters
+> now persist stock and reservations behind the existing core ports. Flyway owns
+> the schema, while Testcontainers verifies migrations, constraints, mapping, and
+> transaction participation against a real PostgreSQL database.
 
 ## Planned proof points
 
@@ -45,14 +45,17 @@ it only from test scope.
 
 ## Build
 
-Requirements: a full JDK from version 21 through 25. The Maven Wrapper
-downloads the pinned Maven distribution.
+Requirements: a full JDK from version 21 through 25 and a Docker-compatible
+container runtime. The Maven Wrapper downloads the pinned Maven distribution.
 
 ```bash
 ./mvnw clean verify
 ```
 
 CI runs the same reactor on Java 21 and Java 25.
+
+Database integration tests always start a disposable PostgreSQL container.
+They never fall back to H2 and never skip silently when Docker is unavailable.
 
 ## Deliberate toolchain boundary
 
