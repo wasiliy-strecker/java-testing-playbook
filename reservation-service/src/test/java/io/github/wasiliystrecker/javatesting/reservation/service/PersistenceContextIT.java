@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 @Import(TestPostgreSqlConfiguration.class)
 class PersistenceContextIT {
 
-  private final JdbcClient jdbc;
+  private final PostgreSqlTestFixture database;
   private final ReservationRepository reservations;
   private final StockGateway stock;
   private final TransactionRunner transactions;
@@ -32,7 +32,7 @@ class PersistenceContextIT {
       ReservationRepository reservations,
       StockGateway stock,
       TransactionRunner transactions) {
-    this.jdbc = jdbc;
+    database = new PostgreSqlTestFixture(jdbc);
     this.reservations = reservations;
     this.stock = stock;
     this.transactions = transactions;
@@ -40,7 +40,7 @@ class PersistenceContextIT {
 
   @BeforeEach
   void resetDatabase() {
-    jdbc.sql("TRUNCATE TABLE reservations, stock_items").update();
+    database.reset();
   }
 
   @Test
@@ -48,7 +48,7 @@ class PersistenceContextIT {
     Sku sku = new Sku("BOOK-42");
     Reservation reservation =
         ReservationBuilder.aReservation().withSku(sku.value()).withQuantity(2).confirmed();
-    insertStock(sku, 5);
+    database.insertStock(sku, 5);
 
     Reservation persisted =
         transactions.execute(
@@ -60,36 +60,13 @@ class PersistenceContextIT {
 
     assertThat(persisted).isEqualTo(reservation);
     assertThat(reservations.findById(reservation.id())).contains(reservation);
-    assertThat(availableStock(sku)).isEqualTo(3);
+    assertThat(database.availableStock(sku)).isEqualTo(3);
   }
 
   @Test
   void databaseConstraintRejectsNegativeStock() {
-    assertThatThrownBy(() -> insertStock(new Sku("BOOK-42"), -1))
+    assertThatThrownBy(() -> database.insertStock(new Sku("BOOK-42"), -1))
         .isInstanceOf(DataIntegrityViolationException.class)
         .hasMessageContaining("stock_items_quantity_non_negative");
-  }
-
-  private void insertStock(Sku sku, int availableQuantity) {
-    jdbc.sql(
-            """
-            INSERT INTO stock_items (sku, available_quantity)
-            VALUES (:sku, :availableQuantity)
-            """)
-        .param("sku", sku.value())
-        .param("availableQuantity", availableQuantity)
-        .update();
-  }
-
-  private int availableStock(Sku sku) {
-    return jdbc.sql(
-            """
-            SELECT available_quantity
-            FROM stock_items
-            WHERE sku = :sku
-            """)
-        .param("sku", sku.value())
-        .query(Integer.class)
-        .single();
   }
 }

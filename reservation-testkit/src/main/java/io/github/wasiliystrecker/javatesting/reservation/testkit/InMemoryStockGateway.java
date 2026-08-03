@@ -1,5 +1,6 @@
 package io.github.wasiliystrecker.javatesting.reservation.testkit;
 
+import io.github.wasiliystrecker.javatesting.reservation.application.StockItemNotFoundException;
 import io.github.wasiliystrecker.javatesting.reservation.application.port.StockGateway;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Quantity;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Sku;
@@ -51,6 +52,13 @@ public final class InMemoryStockGateway implements StockGateway {
   public void increase(Sku sku, Quantity quantity) {
     Objects.requireNonNull(sku, "sku must not be null");
     Objects.requireNonNull(quantity, "quantity must not be null");
-    availableStock.merge(sku, quantity.value(), Math::addExact);
+    availableStock.compute(
+        sku,
+        (ignored, available) -> {
+          if (available == null) {
+            throw new StockItemNotFoundException(sku);
+          }
+          return Math.addExact(available, quantity.value());
+        });
   }
 }

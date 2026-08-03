@@ -1,5 +1,7 @@
 package io.github.wasiliystrecker.javatesting.reservation.service.adapter.persistence;
 
+import io.github.wasiliystrecker.javatesting.reservation.application.ReservationAlreadyExistsException;
+import io.github.wasiliystrecker.javatesting.reservation.application.ReservationNotFoundException;
 import io.github.wasiliystrecker.javatesting.reservation.application.port.ReservationRepository;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Quantity;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Reservation;
@@ -11,7 +13,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.Optional;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -25,33 +29,42 @@ public class JdbcReservationRepository implements ReservationRepository {
   private final JdbcClient jdbc;
 
   public JdbcReservationRepository(JdbcClient jdbc) {
-    this.jdbc = jdbc;
+    this.jdbc = Objects.requireNonNull(jdbc, "jdbc must not be null");
   }
 
   @Override
   public void insert(Reservation reservation) {
-    jdbc.sql(
-            """
-            INSERT INTO reservations (
-                reservation_id, sku, quantity, reservation_status, created_at, released_at
-            ) VALUES (
-                :reservationId, :sku, :quantity, :status, :createdAt, :releasedAt
-            )
-            """)
-        .param("reservationId", reservation.id().value())
-        .param("sku", reservation.sku().value())
-        .param("quantity", reservation.quantity().value())
-        .param("status", reservation.status().name())
-        .param("createdAt", toOffsetDateTime(reservation.createdAt()))
-        .param(
-            "releasedAt",
-            reservation.releasedAt().map(JdbcReservationRepository::toOffsetDateTime).orElse(null),
-            Types.TIMESTAMP_WITH_TIMEZONE)
-        .update();
+    Objects.requireNonNull(reservation, "reservation must not be null");
+    try {
+      jdbc.sql(
+              """
+              INSERT INTO reservations (
+                  reservation_id, sku, quantity, reservation_status, created_at, released_at
+              ) VALUES (
+                  :reservationId, :sku, :quantity, :status, :createdAt, :releasedAt
+              )
+              """)
+          .param("reservationId", reservation.id().value())
+          .param("sku", reservation.sku().value())
+          .param("quantity", reservation.quantity().value())
+          .param("status", reservation.status().name())
+          .param("createdAt", toOffsetDateTime(reservation.createdAt()))
+          .param(
+              "releasedAt",
+              reservation
+                  .releasedAt()
+                  .map(JdbcReservationRepository::toOffsetDateTime)
+                  .orElse(null),
+              Types.TIMESTAMP_WITH_TIMEZONE)
+          .update();
+    } catch (DuplicateKeyException exception) {
+      throw new ReservationAlreadyExistsException(reservation.id(), exception);
+    }
   }
 
   @Override
   public Optional<Reservation> findById(ReservationId reservationId) {
+    Objects.requireNonNull(reservationId, "reservationId must not be null");
     return jdbc.sql(
             """
             SELECT reservation_id, sku, quantity, reservation_status, created_at, released_at
@@ -65,6 +78,7 @@ public class JdbcReservationRepository implements ReservationRepository {
 
   @Override
   public void update(Reservation reservation) {
+    Objects.requireNonNull(reservation, "reservation must not be null");
     int updatedRows =
         jdbc.sql(
                 """
@@ -85,7 +99,7 @@ public class JdbcReservationRepository implements ReservationRepository {
             .update();
 
     if (updatedRows != 1) {
-      throw new IllegalStateException("Reservation does not exist: " + reservation.id().value());
+      throw new ReservationNotFoundException(reservation.id());
     }
   }
 
