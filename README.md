@@ -12,10 +12,10 @@ invalid business transitions, overselling under concurrency, transaction
 rollback, database contract drift, malformed upstream responses, and unstable
 HTTP behavior.
 
-> **Current milestone — reusable persistence contracts:** the same behavioral
-> JUnit contracts now verify the in-memory test doubles and Spring JDBC adapters.
-> PostgreSQL runs through Testcontainers, so adapter drift and database-specific
-> failures are detected without substituting an in-memory database.
+> **Current milestone — PostgreSQL transaction safety:** rollback tests now prove
+> that partial reservation workflows leave no committed changes. A coordinated
+> Virtual Thread scenario sends 100 concurrent reservation attempts against 37
+> units and verifies exactly 37 reservations without negative inventory.
 
 ## Planned proof points
 
@@ -51,6 +51,17 @@ observable behavior and failure semantics are asserted once. The in-memory
 fakes run those contracts as fast unit tests, while the JDBC implementations run
 them unchanged as PostgreSQL integration tests.
 
+## Transaction safety scenarios
+
+Spring-managed transactions are exercised against real PostgreSQL row locks.
+One test forces a duplicate reservation after stock has already been decreased;
+another fails after a reservation release and restock. Both assert the original
+database state after rollback.
+
+The overselling scenario starts every Virtual Thread through explicit latches,
+uses bounded waits, and never relies on timing sleeps. Successful transactions,
+stored reservations, and remaining stock must agree exactly.
+
 ## Build
 
 Requirements: a full JDK from version 21 through 25 and a Docker-compatible
@@ -78,7 +89,7 @@ both tools support JUnit Platform 6.
 - [x] Reproducible multi-module build and Java 21/25 CI
 - [x] Reservation domain with deterministic unit tests
 - [x] Testkit and property-based invariants
-- [ ] PostgreSQL contracts and concurrency scenarios
+- [x] PostgreSQL contracts and concurrency scenarios
 - [ ] HTTP boundary and component tests
 - [ ] Coverage and mutation quality gates
 - [ ] First tagged release

@@ -28,3 +28,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
   and PostgreSQL adapters
 - Consistent application exceptions for duplicate reservations and missing
   reservation or stock records
+- PostgreSQL rollback verification for failed reservation creation and release
+  workflows
+- Coordinated Virtual Thread integration scenario proving that concurrent
+  reservations cannot oversell stock

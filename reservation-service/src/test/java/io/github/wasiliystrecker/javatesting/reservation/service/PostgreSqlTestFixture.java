@@ -39,4 +39,8 @@ final class PostgreSqlTestFixture {
         .optional()
         .orElse(0);
   }
+
+  long reservationCount() {
+    return jdbc.sql("SELECT COUNT(*) FROM reservations").query(Long.class).single();
+  }
 }
