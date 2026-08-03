@@ -12,10 +12,10 @@ invalid business transitions, overselling under concurrency, transaction
 rollback, database contract drift, malformed upstream responses, and unstable
 HTTP behavior.
 
-> **Current milestone — PostgreSQL persistence foundation:** Spring JDBC adapters
-> now persist stock and reservations behind the existing core ports. Flyway owns
-> the schema, while Testcontainers verifies migrations, constraints, mapping, and
-> transaction participation against a real PostgreSQL database.
+> **Current milestone — reusable persistence contracts:** the same behavioral
+> JUnit contracts now verify the in-memory test doubles and Spring JDBC adapters.
+> PostgreSQL runs through Testcontainers, so adapter drift and database-specific
+> failures are detected without substituting an in-memory database.
 
 ## Planned proof points
 
@@ -42,6 +42,14 @@ global state, sleeps, and broad mocking.
 
 Production code must not depend on `reservation-testkit`. The service may use
 it only from test scope.
+
+## Adapter contract strategy
+
+`reservation-testkit` exports abstract contracts for the reservation and stock
+ports. Every adapter supplies only its setup and state-inspection hooks; all
+observable behavior and failure semantics are asserted once. The in-memory
+fakes run those contracts as fast unit tests, while the JDBC implementations run
+them unchanged as PostgreSQL integration tests.
 
 ## Build
 

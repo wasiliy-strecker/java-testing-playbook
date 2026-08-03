@@ -1,5 +1,7 @@
 package io.github.wasiliystrecker.javatesting.reservation.testkit;
 
+import io.github.wasiliystrecker.javatesting.reservation.application.ReservationAlreadyExistsException;
+import io.github.wasiliystrecker.javatesting.reservation.application.ReservationNotFoundException;
 import io.github.wasiliystrecker.javatesting.reservation.application.port.ReservationRepository;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Reservation;
 import io.github.wasiliystrecker.javatesting.reservation.domain.ReservationId;
@@ -18,7 +20,7 @@ public final class InMemoryReservationRepository implements ReservationRepositor
     Objects.requireNonNull(reservation, "reservation must not be null");
     Reservation previous = reservations.putIfAbsent(reservation.id(), reservation);
     if (previous != null) {
-      throw new IllegalStateException("Reservation already exists: " + reservation.id().value());
+      throw new ReservationAlreadyExistsException(reservation.id());
     }
   }
 
@@ -33,7 +35,7 @@ public final class InMemoryReservationRepository implements ReservationRepositor
     Objects.requireNonNull(reservation, "reservation must not be null");
     Reservation previous = reservations.replace(reservation.id(), reservation);
     if (previous == null) {
-      throw new IllegalStateException("Reservation does not exist: " + reservation.id().value());
+      throw new ReservationNotFoundException(reservation.id());
     }
   }
 

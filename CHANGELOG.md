@@ -24,3 +24,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
   application ports
 - Flyway-managed PostgreSQL schema with lifecycle and stock constraints
 - Spring Boot integration coverage against a disposable PostgreSQL 17 container
+- Reusable reservation and stock port contracts executed against both in-memory
+  and PostgreSQL adapters
+- Consistent application exceptions for duplicate reservations and missing
+  reservation or stock records

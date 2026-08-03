@@ -1,8 +1,10 @@
 package io.github.wasiliystrecker.javatesting.reservation.service.adapter.persistence;
 
+import io.github.wasiliystrecker.javatesting.reservation.application.StockItemNotFoundException;
 import io.github.wasiliystrecker.javatesting.reservation.application.port.StockGateway;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Quantity;
 import io.github.wasiliystrecker.javatesting.reservation.domain.Sku;
+import java.util.Objects;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -12,11 +14,13 @@ public class JdbcStockGateway implements StockGateway {
   private final JdbcClient jdbc;
 
   public JdbcStockGateway(JdbcClient jdbc) {
-    this.jdbc = jdbc;
+    this.jdbc = Objects.requireNonNull(jdbc, "jdbc must not be null");
   }
 
   @Override
   public boolean tryDecrease(Sku sku, Quantity quantity) {
+    Objects.requireNonNull(sku, "sku must not be null");
+    Objects.requireNonNull(quantity, "quantity must not be null");
     int updatedRows =
         jdbc.sql(
                 """
@@ -33,6 +37,8 @@ public class JdbcStockGateway implements StockGateway {
 
   @Override
   public void increase(Sku sku, Quantity quantity) {
+    Objects.requireNonNull(sku, "sku must not be null");
+    Objects.requireNonNull(quantity, "quantity must not be null");
     int updatedRows =
         jdbc.sql(
                 """
@@ -45,7 +51,7 @@ public class JdbcStockGateway implements StockGateway {
             .update();
 
     if (updatedRows != 1) {
-      throw new IllegalStateException("Stock item does not exist: " + sku.value());
+      throw new StockItemNotFoundException(sku);
     }
   }
 }
