@@ -1,6 +1,7 @@
 # Java Testing Playbook
 
 [![Verify](https://github.com/wasiliy-strecker/java-testing-playbook/actions/workflows/verify.yml/badge.svg)](https://github.com/wasiliy-strecker/java-testing-playbook/actions/workflows/verify.yml)
+[![Release](https://img.shields.io/github/v/release/wasiliy-strecker/java-testing-playbook)](https://github.com/wasiliy-strecker/java-testing-playbook/releases/latest)
 [![Java 21](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
@@ -92,7 +93,7 @@ both tools support JUnit Platform 6.
 - [x] PostgreSQL contracts and concurrency scenarios
 - [ ] HTTP boundary and component tests
 - [ ] Coverage and mutation quality gates
-- [ ] First tagged release
+- [x] First tagged release
 
 ## License
 
