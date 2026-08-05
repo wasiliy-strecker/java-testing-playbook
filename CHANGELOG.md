@@ -7,6 +7,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-05
+
 ### Added
 
 - Multi-module Maven foundation for the reservation core, testkit, and service
@@ -32,3 +34,6 @@ and this project follows [Semantic Versioning](https://semver.org/).
   workflows
 - Coordinated Virtual Thread integration scenario proving that concurrent
   reservations cannot oversell stock
+
+[Unreleased]: https://github.com/wasiliy-strecker/java-testing-playbook/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/wasiliy-strecker/java-testing-playbook/releases/tag/v0.1.0
